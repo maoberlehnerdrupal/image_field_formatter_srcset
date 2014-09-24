@@ -1,0 +1,100 @@
+<?php
+
+/**
+ * @file
+ * Provide fields for srcet attributes on image fields.
+ */
+
+/**
+ * Implements hook_field_formatter_info_alter().
+ */
+function image_field_formatter_srcset_field_formatter_info_alter(&$info) {
+  // Added to all image formatters...
+  foreach ($info as &$formatter) {
+    $formatter['settings']['image_field_formatter_srcset_sizes'] = '';
+    $formatter['settings']['image_field_formatter_srcset'] = '';
+  }
+}
+
+/**
+ * Implements hook_field_formatter_settings_summary_alter().
+ */
+function image_field_formatter_srcset_field_formatter_settings_summary_alter(&$summary, $context) {
+  if ($context['field']['module'] == 'image') {
+    $display = $context['instance']['display'][$context['view_mode']];
+    $settings = $display['settings'];
+
+    if (!empty($summary)) {
+      $summary .= '<br />';
+    }
+
+    if (!empty($settings['image_field_formatter_srcset_sizes']) || !empty($settings['image_field_formatter_srcset'])) {
+      if (!empty($settings['image_field_formatter_srcset_sizes'])) {
+        $summary .= t('Sizes: @field', array('@field' => filter_xss($settings['image_field_formatter_srcset_sizes'], array()))) . '<br />';
+      }
+      if (!empty($settings['image_field_formatter_srcset'])) {
+        $summary .= t('Srcset: @field', array('@field' => filter_xss($settings['image_field_formatter_srcset'], array())));
+      }
+    }
+    else {
+      $summary .= t('No Srcset settings');
+    }
+  }
+}
+
+/**
+ * Implements hook_field_formatter_settings_form_alter().
+ */
+function image_field_formatter_srcset_field_formatter_settings_form_alter(&$settings_form, $context) {
+  if ($context['field']['module'] == 'image') {
+    $display = $context['instance']['display'][$context['view_mode']];
+    $settings = $display['settings'];
+
+    $settings_form['image_field_formatter_srcset_sizes'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Field Formatter Sizes'),
+      '#default_value' => $settings['image_field_formatter_srcset_sizes'],
+    );
+    $settings_form['image_field_formatter_srcset'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Field Formatter Srcset'),
+      '#default_value' => $settings['image_field_formatter_srcset'],
+    );
+  }
+}
+
+/**
+ * Implements hook_preprocess_field().
+ *
+ * Adds a custom size and/or srcet attribute(s) to the field's
+ * attributes array according to the field formatter settings.
+ */
+function image_field_formatter_srcset_preprocess_field(&$vars, $hook) {
+  $entity_type = $vars['element']['#entity_type'];
+  $field_name  = $vars['element']['#field_name'];
+  $bundle      = $vars['element']['#bundle'];
+  $view_mode   = $vars['element']['#view_mode'];
+
+  $formatter_info = field_formatter_settings_get_instance_display_settings($entity_type, $field_name, $bundle, $view_mode);
+
+  // add class for whole field
+  if (!empty($formatter_info['image_field_formatter_srcset_sizes']) || !empty($formatter_info['image_field_formatter_srcset'])) {
+    // Set the attributes
+    foreach ($vars['items'] as $delta => $item) {
+      // Get the image style urls
+      $image_style_urls = array();
+      foreach (image_styles() as $style_name => $style) {
+        $image_style_urls['@' . $style_name] = image_style_url($style_name, $item['#item']['uri']);
+      }
+      if (!isset($item['#item']['attributes'])) {
+        $vars['items'][$delta]['#item']['attributes'] = array();
+      }
+      if (!empty($formatter_info['image_field_formatter_srcset_sizes'])) {
+        $vars['items'][$delta]['#item']['attributes']['sizes'] = $formatter_info['image_field_formatter_srcset_sizes'];
+      }
+      if (!empty($formatter_info['image_field_formatter_srcset'])) {
+        $vars['items'][$delta]['#item']['attributes']['srcset'] = format_string($formatter_info['image_field_formatter_srcset'], $image_style_urls);
+      }
+    }
+  }
+}
