@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Provide fields for srcet attributes on image fields.
+ * Provide fields for srcset attributes on image fields.
  */
 
 /**
@@ -77,11 +77,11 @@ function image_field_formatter_srcset_preprocess_field(&$vars, $hook) {
 
   $formatter_info = field_formatter_settings_get_instance_display_settings($entity_type, $field_name, $bundle, $view_mode);
 
-  // add class for whole field
+  // Add class for whole field.
   if (!empty($formatter_info['image_field_formatter_srcset_sizes']) || !empty($formatter_info['image_field_formatter_srcset'])) {
-    // Set the attributes
+    // Set the attributes.
     foreach ($vars['items'] as $delta => $item) {
-      // Get the image style urls
+      // Get the image style urls.
       $image_style_urls = array();
       foreach (image_styles() as $style_name => $style) {
         $image_style_urls['@' . $style_name] = image_style_url($style_name, $item['#item']['uri']);
