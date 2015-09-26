@@ -1,11 +1,6 @@
-name = Image Field Formatter Srcset
-description = "Allows srcset attributes for image fields"
+name = Image field formatter: srcset
+description = Adds a field formatter to image fields that makes it possible to add a srcset attribute.
 core = 7.x
 package = Fields
 dependencies[] = field
 dependencies[] = field_formatter_settings
-
-version = "7.x-1.0"
-core = "7.x"
-project = "image_field_formatter_srcset"
-datestamp = "1361374877"
