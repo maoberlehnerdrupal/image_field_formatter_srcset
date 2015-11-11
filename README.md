@@ -1,7 +1,7 @@
 # DEPRECATED!
 Since version 2.x the official [Picture](https://www.drupal.org/project/picture)
 module supports the output of pure img tags with srcset and sizes attributes
-which makes this module obsolete. Pleaase use the
+which makes this module obsolete. Please use the
 [Picture](https://www.drupal.org/project/picture) module.
 
 # Image field formatter: srcset
